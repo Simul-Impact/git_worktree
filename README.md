@@ -2,35 +2,61 @@
 
 Shared scripts to work with [git-worktree](https://git-scm.com/docs/git-worktree) in an [Elixir](https://elixir-lang.org/) project.
 
-## How to
+## Prerequisites
 
-All of the projects that warrant the use of [git-worktree](https://git-scm.com/docs/git-worktree) are setup in the same way.
+- Git 2.5+ (for git-worktree support)
+- Elixir project with standard dependency management
 
-1. A bare repository is cloned in a directory called `.bare`.
+## Setup
 
-- `mkdir my_new_project`
-- `cd my_new_project`
-- `git clone --bare git@github.com:<USER>/<PROJECT>.git .bare`
-- `echo "gitdir: ./.bare" > .git`
+All projects that warrant the use of [git-worktree](https://git-scm.com/docs/git-worktree) are setup in the same way.
 
-Then the main branch is checked out by running `git worktree main`.
+1. Create a new directory and clone the repository as bare:
 
-Replace the `PROJECT_NAME` in `bin/new` with you proper project name.
+```bash
+mkdir my_new_project
+cd my_new_project
+git clone --bare git@github.com:<USER>/<PROJECT>.git .bare
+echo "gitdir: ./.bare" > .git
+```
 
-Once done copy this repository's bin directory at the root of the worktree.
+2. Check out the main branch:
 
-That way the main workflow commands become available:
+```bash
+git worktree add main
+```
 
-`./bin/new branch_name` 
+3. Copy this repository's `bin` directory to the root of your worktree.
 
-Creates a new worktre and the corresponding branch to work on.
-Links the compiled dependencies from the `.cache` directory to avoid redownload and recompilation.
+4. Replace the `PROJECT_NAME` in `bin/new` with your proper project name.
 
-`./bin/done branch_name` 
+## Usage
 
-Merges all your commits into a single one. Pushes to the origin. Then deletes the worktree and the branch.
+The main workflow commands provide a complete development cycle:
 
-And also provides the following utility commands:
+### `./bin/new branch_name`
+
+Creates a new feature branch and development environment:
+1. Syncs the main branch with origin
+2. Creates a new worktree with a corresponding branch
+3. Links cached dependencies from `.cache/deps` to avoid redownload
+4. Symlinks compiled dependencies from `.cache/_build` to avoid recompilation
+5. Runs `mix setup` to prepare the environment
+
+After running this command, you can work in the new worktree directory, making commits as needed.
+
+### `./bin/done branch_name`
+
+Completes the feature development and cleans up:
+1. Merges all your commits into a single squashed commit on main
+2. Prompts for a commit message (interactive)
+3. Pushes the changes to origin
+4. Removes the worktree directory
+5. Deletes the feature branch
+
+This ensures a clean git history with one commit per feature.
+
+## Utility Commands
 
 - `./bin/sync` - Syncs the main worktree from origin.
 - `./bin/ls` - Lists all worktrees.
