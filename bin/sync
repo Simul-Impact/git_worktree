@@ -1,0 +1,5 @@
+#!/bin/zsh
+
+echo "Syncing main branch with origin..."
+cd main && git pull origin main && cd ..
+echo "✅ Main branch synced"

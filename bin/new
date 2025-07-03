@@ -1,0 +1,37 @@
+#!/bin/zsh
+
+SHARED_CACHE_PATH="../.cache"
+PROJECT_NAME="my_new_project"
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: ./bin/new <branch-name>"
+    exit 1
+fi
+
+BRANCH_NAME="$1"
+
+# Sync main first
+echo "Syncing main branch..."
+cd main && git pull origin main && cd ..
+
+# Create worktree from bare repo
+git --git-dir=.bare worktree add -b "$BRANCH_NAME" "$BRANCH_NAME"
+echo "Created worktree: ./$BRANCH_NAME"
+
+echo "Linking cached deps and _build in ./$BRANCH_NAME"
+ln -s ../.cache/deps ./$BRANCH_NAME/deps
+
+# Create _build structure but symlink compiled deps
+mkdir -p ./$BRANCH_NAME/_build/dev/lib
+cd ./$BRANCH_NAME/_build/dev/lib
+
+for dep in "$(pwd)/../../../$SHARED_CACHE_PATH/_build/dev/lib"/*; do
+  dep_name=$(basename "$dep")
+  if [ "$dep_name" != "$PROJECT_NAME" ]; then
+    ln -sf "$dep" "$dep_name"
+  fi
+done
+
+cd ../../.. && mix setup
+
+echo "Switched to $BRANCH_NAME"

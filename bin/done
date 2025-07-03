@@ -1,0 +1,23 @@
+#!/bin/zsh
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: ./bin/done <branch-name>"
+    exit 1
+fi
+
+BRANCH_NAME="$1"
+
+if [[ ! -d "$BRANCH_NAME" ]]; then
+    echo "❌ Worktree $BRANCH_NAME doesn't exist"
+    exit 1
+fi
+
+echo "Merging $BRANCH_NAME to main..."
+cd main
+git merge --squash "$BRANCH_NAME" && \
+git commit && \
+git push origin main && \
+cd .. && \
+git --git-dir=.bare worktree remove "$BRANCH_NAME" && \
+git --git-dir=.bare branch -D "$BRANCH_NAME" && \
+echo "✅ Feature $BRANCH_NAME merged, pushed, and cleaned up!"

@@ -1,0 +1,11 @@
+#!/bin/zsh
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: ./bin/remove <branch-name>"
+    exit 1
+fi
+
+BRANCH_NAME="$1"
+git --git-dir=.bare worktree remove "$BRANCH_NAME" 2>/dev/null
+git --git-dir=.bare branch -d "$BRANCH_NAME" 2>/dev/null
+echo "Removed worktree and branch: $BRANCH_NAME"
