@@ -59,5 +59,6 @@ This ensures a clean git history with one commit per feature.
 ## Utility Commands
 
 - `./bin/sync` - Syncs the main worktree from origin.
+- `./bin/fetch` - Fetch a remote branch. Often used for code reviews.
 - `./bin/ls` - Lists all worktrees.
 - `./bin/remove` - Removes any worktree not removed by `./bin/done`.
