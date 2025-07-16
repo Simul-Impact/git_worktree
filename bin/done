@@ -14,6 +14,7 @@ fi
 
 echo "Merging $BRANCH_NAME to main..."
 cd main
+git pull origin main
 git merge --squash "$BRANCH_NAME" && \
 git commit && \
 git push origin main && \
